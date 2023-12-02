@@ -1,4 +1,19 @@
-# Backend Test
+# Backend Design Test
+
+## Assumptions
+
+### Functionality
+
+- Auction feature:
+  - Will be just a simple booking with payment higher than current active booking amount.
+  - The payment must be a minimum current active booking amount plus minimum auction charge for that table.
+  - The payment must be made in full.
+
+### Technicallity
+
+- Auth managed with simple design to show case sequence diagram.
+  - In reality should use provider like Firebase Identity.
+- Venue details (name, address, rating, distance) using Google Maps API.
 
 ## Diagrams
 
@@ -37,6 +52,7 @@ erDiagram
       bool is_phone_verified
       bool is_email_verified
       int photo_id FK
+      int rank_id FK
     }
 
     PHOTOS {
@@ -51,8 +67,178 @@ erDiagram
       datetime approved
     }
 
+    NOTIFICATIONS {
+      int id PK
+      uuid user_id FK
+      string type
+      string message
+    }
+
+    RANKS {
+      int id PK
+      int priority
+      string name
+    }
+
+    RANK_TASKS {
+      int id PK
+      int rank_id FK
+      string title
+      string description
+    }
+
+    USER_TASKS {
+      int id PK
+      uuid user_id FK
+      int rank_task_id FK
+    }
+
+    DJS {
+      uuid id PK
+      string name
+      int photo_id FK
+      uuid user_id FK
+    }
+
+    VENUES {
+      uuid id PK
+      string name
+      string location_id
+    }
+
+    VENUE_FACILITIES {
+      int id PK
+      uuid venue_id FK
+      int priority
+      string title
+      string description
+    }
+
+    VENUE_OFFERS {
+      int id PK
+      uuid venue_id FK
+      int priority
+      string title
+      string description
+      int photo_id FK
+    }
+
+    VENUE_BEVERAGES {
+      int id PK
+      uuid venue_id FK
+      int priority
+      string title
+      string description
+      int photo_id FK
+    }
+
+    TABLES {
+      uuid id PK
+      uuid venue_id FK
+      string name
+      real min_deposit
+      real min_auction_charge
+    }
+
+    TABLE_FACILITIES {
+      int id PK
+      uuid table_id FK
+      string title
+      string description
+      blob icon
+    }
+
+    EVENTS {
+      uuid id PK
+      uuid venue_id FK
+      string name
+      date date
+      string description
+      id poster_id FK
+    }
+
+    EVENT_PHOTOS {
+      int id PK
+      uuid event_id FK
+      int photo_id FK
+      int priority
+    }
+
+    EVENT_DJS {
+      int id PK
+      uuid event_id FK
+      uuid dj_id FK
+      datetime start
+      datetime end
+    }
+
+    BOOKING {
+      uuid id PK
+      uuid user_id FK
+      uuid table_id FK
+      date date
+      real auction_amount
+      real discount_amount
+      real service_amount
+      real charge_amount
+      real paid_amount
+      datetime fully_paid_at
+      datetime lost_auction_at
+      real refund_amount
+    }
+
+    BOOKING_PAYMENTS {
+      uuid id PK
+      uuid booking_id FK
+      int payment_method FK
+      real amount
+      json charge_payload
+      json success_response
+      json failed_response
+    }
+
+    INVITATIONS {
+      int id PK
+      uuid booking_id FK
+      uuid requester_id FK
+      uuid addressee_id FK
+      datetime approved
+    }
+
+    PAYMENT_METHODS {
+      int id PK
+      string provider
+      string method
+    }
+
+    USERS }o--o{ FRIENDS : have
     USERS ||--o| PHOTOS : has
-    USERS }|--|| FRIENDS : have
+    USERS ||--o{ NOTIFICATIONS : have
+    USERS ||--|| RANKS : is
+    RANKS ||--|{ RANK_TASKS : have
+    USERS ||--o{ USER_TASKS : have
+    RANK_TASKS ||--|{ USER_TASKS : have
+    DJS ||--o| USERS : is
+    DJS ||--o| PHOTOS : has
+    VENUES ||--o{ VENUE_FACILITIES : have
+    VENUES ||--o{ VENUE_BEVERAGES : have
+    VENUES ||--o{ VENUE_OFFERS : have
+    VENUES ||--o{ EVENTS : have
+    VENUES ||--o{ TABLES : have
+    VENUES ||--o| PHOTOS : has
+    VENUE_BEVERAGES ||--o| PHOTOS : has
+    VENUE_OFFERS ||--o| PHOTOS : has
+    EVENTS ||--o| PHOTOS : has
+    EVENTS ||--o{ EVENT_PHOTOS : have
+    EVENTS ||--o{ EVENT_DJS : have
+    EVENT_PHOTOS ||--o| PHOTOS : has
+    BOOKING ||--o{ BOOKING_PAYMENTS : have
+    BOOKING_PAYMENTS }|--|| PAYMENT_METHODS : have
+    TABLES ||--o{ BOOKING : have
+    BOOKING ||--o{ INVITATIONS : have
+    USERS }o--o{ INVITATIONS : have
+    TABLES ||--o{ TABLE_FACILITIES : have
+    USERS ||--o{ BOOKING : have
 ```
 
 ## Endpoints

@@ -8,6 +8,9 @@
   - Will be just a simple booking with payment higher than current active booking amount.
   - The payment must be a minimum current active booking amount plus minimum auction charge for that table.
   - The payment must be made in full.
+- Voucher system:
+  - Voucher with simple constraints.
+  - User eligibility based on rank map.
 
 ### Technicallity
 
@@ -104,6 +107,7 @@ erDiagram
       uuid id PK
       string name
       string location_id
+      string[] tags
     }
 
     VENUE_FACILITIES {
@@ -177,14 +181,22 @@ erDiagram
       uuid user_id FK
       uuid table_id FK
       date date
-      real auction_amount
-      real discount_amount
-      real service_amount
       real charge_amount
       real paid_amount
       datetime fully_paid_at
       datetime lost_auction_at
       real refund_amount
+    }
+
+    BOOKING_CHARGES {
+      int id PK
+      uuid booking_id FK
+      real amount
+      string type "bid | discount | fee | xxx"
+      int voucher_id FK
+      int fee_id FK
+      string title "snapshot"
+      string description "snapshot"
     }
 
     BOOKING_PAYMENTS {
@@ -195,6 +207,46 @@ erDiagram
       json charge_payload
       json success_response
       json failed_response
+    }
+
+    VOUCHERS {
+      uuid id PK
+      string code
+      string title
+      string description
+      enum type "percentage | amount"
+      real discount
+      real max_percentage_discount
+      real min_bid
+      real max_bid
+      datetime valid_from
+      datetime valid_until
+      int photo_id FK
+    }
+
+    RANK_VOUCHERS {
+      int id PK
+      uuid voucher_id FK
+      int rank_id FK
+      int max_usage
+    }
+
+    FEES {
+      int id PK
+      string title
+      string description
+      enum type "percentage | amount"
+      real fee
+      real min_percentage_fee
+      real max_percentage_fee
+      real min_bid
+      real max_bid
+    }
+
+    RANK_FEES {
+      int id PK
+      uuid fee_id FK
+      int rank_id FK
     }
 
     INVITATIONS {
@@ -239,6 +291,12 @@ erDiagram
     USERS }o--o{ INVITATIONS : have
     TABLES ||--o{ TABLE_FACILITIES : have
     USERS ||--o{ BOOKING : have
+    BOOKING ||--|{ BOOKING_CHARGES : have
+    BOOKING_CHARGES ||--o{ VOUCHERS : have
+    BOOKING_CHARGES ||--o{ FEES : have
+    VOUCHERS }|--|| RANKS : eligible
+    VOUCHERS ||--o| PHOTOS : has
+    FEES }|--|| RANKS : eligible
 ```
 
 ## Endpoints

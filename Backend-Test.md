@@ -41,8 +41,6 @@ sequenceDiagram
 
 ### Entity Relationship Diagram
 
-- All table have timestamps (create, update, dekete) and it is omitted unless necessary for verbosity.
-
 [View ERD as SVG](./erd.svg)
 
 ## Endpoints

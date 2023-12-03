@@ -41,8 +41,8 @@ sequenceDiagram
 
 ### Entity Relationship Diagram
 
-[View ERD as SVG](./erd.svg)
+[View ERD](https://aditbisa.github.io/backend-design-test/erd.svg)
 
 ## Endpoints
 
-[View API as HTML](./api.html)
+[View API](https://aditbisa.github.io/backend-design-test/api.html)
